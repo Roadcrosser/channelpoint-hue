@@ -119,7 +119,7 @@ while not HUE_KEY:
     else:
         HUE_KEY = resp["success"]["username"]
 
-print(f"Your token is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to skip this step in the future.")
+print(f"Your key is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to skip this step in the future.")
 
 # setting up Authentication and getting your user id
 twitch.authenticate_app([])
