@@ -1,0 +1,27 @@
+# You can apparently get this from discovery.meethue.com (apparently your bridge may need to be "discoverable"?)
+HUE_URL: http://192.168.86.34
+
+# Your light number, it's probably 1
+HUE_ID: 1
+
+# https://dev.twitch.tv/console/apps/create
+# Set the OAuth Redirect URL to http://localhost:17563
+CLIENT_ID: 12345
+CLIENT_SECRET: abcde
+
+# Twitch username
+USERNAME: bigpeep3estreamer
+# Channel Point Reward Name (make this match the actual reward)
+REWARD_NAME: Change light color
+
+# Set to True to force the light on when a color change request comes through. Set to False to make it not do that.
+FORCE_ON: true
+
+# If you don't have one yet, you can get one later and put it here when you do get it
+HUE_KEY: null
+
+# A value from 0 to 100. The minimum brightness value allowed for the light to be. 
+MINIMUM_BRIGHTNESS: 0
+
+# A value from 0 to 100. The maximum brightness value allowed for the light to be. 
+MAXIMUM_BRIGHTNESS: 100

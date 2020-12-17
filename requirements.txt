@@ -1,0 +1,3 @@
+twitchAPI
+requests
+aiohttp
