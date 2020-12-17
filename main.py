@@ -124,7 +124,7 @@ print(f"Your token is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` 
 # setting up Authentication and getting your user id
 twitch.authenticate_app([])
 
-target_scope = [AuthScope.WHISPERS_READ]
+target_scope = [AuthScope.CHANNEL_READ_REDEMPTIONS]
 auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 
 # this will open your default browser and prompt you with the twitch verification website
