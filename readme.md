@@ -1,5 +1,11 @@
 # Twitch Channel Points Philips Hue integration
 
+Requirements:
+
+ - a Philips Hue Bridge (it's the box you press a button with to connect it with your streamdeck I think)
+ - a Philips Hue
+ - at least Affiliate on Twitch for access to channel points
+
 (I don't have either so I've never tested any of this)
 
 1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't.
