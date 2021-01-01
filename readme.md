@@ -4,9 +4,9 @@ Requirements:
 
  - a Philips Hue Bridge (it's the box you press a button with to connect it with your streamdeck I think)
  - a Philips Hue
- - at least Affiliate on Twitch for access to channel points
+ - at least affiliate on Twitch for access to channel points
 
-(I don't have either so I've never tested any of this)
+(I don't have any of these things so I've never tested any of this)
 
 1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't.
 2. Run `pip install -r requirements.txt` in command prompt (Admin mode) to install dependencies (you only need to do this once)
