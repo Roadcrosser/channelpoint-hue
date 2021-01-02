@@ -8,7 +8,7 @@ Requirements:
 
 (I don't have any of these things so I've never tested any of this)
 
-1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't.
+1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't. Ensure the "Install to PATH" setting is checked.
 2. Run `pip install -r requirements.txt` in command prompt (Admin mode) to install dependencies (you only need to do this once)
 3. Fill in `config.yaml` with the required details (You can probably use notepad for this, but the text won't be colored)
 4. Run `run.bat` and follow the prompts
