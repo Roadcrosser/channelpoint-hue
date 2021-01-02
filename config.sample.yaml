@@ -28,4 +28,5 @@ MAXIMUM_BRIGHTNESS: 100
 DEBUG: false
 
 # Whisper test mode. Set to true to test for whispers instead.
+# IMPORTANT: Delete secrets.json whenever this is changed.
 WHISPER_MODE: false
