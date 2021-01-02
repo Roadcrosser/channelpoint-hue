@@ -1,3 +1,4 @@
 twitchAPI
 requests
 aiohttp
+pyaml
