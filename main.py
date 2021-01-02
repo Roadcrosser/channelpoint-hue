@@ -50,7 +50,7 @@ secrets_fn = "secrets.json"
 
 def update_secrets(new_data):
     with open(secrets_fn, "w+") as fl:
-        fl.write(new_data)
+        fl.write(json.dumps(new_data))
 
 
 def load_secrets():
