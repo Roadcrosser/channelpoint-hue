@@ -8,6 +8,7 @@ import asyncio
 import colorsys
 import json
 import re
+import os
 
 import requests
 import yaml
@@ -30,13 +31,41 @@ REWARD_NAME = config["REWARD_NAME"]
 
 FORCE_ON = config["FORCE_ON"]
 
-HUE_KEY = config["HUE_KEY"]
-
 MINIMUM_BRIGHTNESS = config["MINIMUM_BRIGHTNESS"]
 
 MAXIMUM_BRIGHTNESS = config["MAXIMUM_BRIGHTNESS"]
 
 DEBUG = config["DEBUG"]
+WHISPER_MODE = config["WHISPER_MODE"]
+
+secrets = {
+    "HUE_KEY": None,
+    "TOKEN": None,
+    "REFRESH_TOKEN": None,
+}
+
+
+secrets_fn = "secrets.json"
+
+
+def update_secrets(new_data):
+    with open(secrets_fn, "w+") as fl:
+        fl.write(new_data)
+
+
+def load_secrets():
+    with open(secrets_fn) as fl:
+        return json.loads(fl)
+
+
+if not secrets_fn in os.listdir():
+    update_secrets(secrets)
+else:
+    secrets = load_secrets()
+
+HUE_KEY = secrets["HUE_KEY"]
+TOKEN = secrets["TOKEN"]
+REFRESH_TOKEN = secrets["REFRESH_TOKEN"]
 
 
 headers = {"content-type": "application/json"}
@@ -47,26 +76,39 @@ twitch.session = None
 
 def callback(uuid: UUID, data: dict) -> None:
     if DEBUG:
-        print(data)
+        print("Data received: ", data)
 
-    if data["type"] != "whisper_received":
-        return
+    ### This block for testing on whispers ###
+    if WHISPER_MODE:
+        if data["type"] != "whisper_received":
+            return
 
-    resp_data = data["data"]
-    resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
+        resp_data = data["data"]
+        resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
 
-    original_color = resp_data["body"]
+        initiating_user = resp_data["tags"]["login"]
+        original_color = resp_data["body"]
 
-    # if data["type"] != "reward-redeemed":
-    #     return
+    ### End Block ###
 
-    # resp_data = data["data"]
-    # resp_data = json.loads(resp_data) # Comment this if it breaks somehow
+    ### This block for prod channel points ###
+    else:
+        if data["type"] != "reward-redeemed":
+            return
 
-    # if resp_data["reward"]["title"] != REWARD_NAME:
-    #     return
+        resp_data = data["data"]
+        resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
 
-    # original_color = resp_data["user_input"]
+        if resp_data["reward"]["title"] != REWARD_NAME:
+            return
+
+        initiating_user = resp_data["user"]["login"]
+        original_color = resp_data["user_input"]
+
+    ### End Block ###
+
+    if DEBUG:
+        print("User input: ", original_color)
 
     original_color = re.sub(r"\s", "", str(original_color).strip())
 
@@ -75,8 +117,6 @@ def callback(uuid: UUID, data: dict) -> None:
     hue = 0
     sat = 0
     bri = 0
-
-    initiating_user = resp_data["user"]["login"]
 
     try:
         color = COLOR_LOOKUP.get(color, color)
@@ -98,6 +138,9 @@ def callback(uuid: UUID, data: dict) -> None:
         print(f"{initiating_user}: Failed to parse color {original_color}")
         return
 
+    if DEBUG:
+        print("Final color:", color)
+
     payload = {"hue": hue, "sat": sat, "bri": bri}
 
     if FORCE_ON:
@@ -105,12 +148,18 @@ def callback(uuid: UUID, data: dict) -> None:
 
     hue_id = HUE_ID
 
+    if DEBUG:
+        print("Sending to hue:", payload)
+
     asyncio.get_event_loop().create_task(
-        callback_task(initiating_user, hue_id, payload)
+        callback_task(initiating_user, hue_id, payload, color)
     )
 
 
-async def callback_task(initiating_user, bulb_id, payload):
+async def callback_task(initiating_user, bulb_id, payload, color):
+
+    if DEBUG:
+        print("Running callback task...")
 
     if not twitch.session:
         twitch.session = aiohttp.ClientSession()
@@ -125,6 +174,7 @@ async def callback_task(initiating_user, bulb_id, payload):
 
 
 while not HUE_KEY:
+
     # Press button
     input("Press the link button on the bridge and then press ENTER...\n")
     r = requests.post(
@@ -137,21 +187,28 @@ while not HUE_KEY:
         print(f"An error has occured: \"{resp['error']['description']}\"\nRetrying...")
     else:
         HUE_KEY = resp["success"]["username"]
+        secrets["HUE_KEY"] = HUE_KEY
+        update_secrets(secrets)
 
-print(
-    f"Your key is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to skip this step in the future."
-)
+print("Hue successfully linked.")
+
 
 # setting up Authentication and getting your user id
 twitch.authenticate_app([])
 
-# target_scope = [AuthScope.CHANNEL_READ_REDEMPTIONS]
-target_scope = [AuthScope.WHISPERS_READ]
+target_scope = [
+    AuthScope.CHANNEL_READ_REDEMPTIONS if not WHISPER_MODE else AuthScope.WHISPERS_READ
+]
 auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 
-# this will open your default browser and prompt you with the twitch verification website
-token, refresh_token = auth.authenticate()
-twitch.set_user_authentication(token, target_scope, refresh_token)
+if (not TOKEN) or (not REFRESH_TOKEN):
+    # this will open your default browser and prompt you with the twitch verification website
+    TOKEN, REFRESH_TOKEN = auth.authenticate()
+    secrets["TOKEN"] = TOKEN
+    secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
+    update_secrets(secrets)
+
+twitch.set_user_authentication(TOKEN, target_scope, REFRESH_TOKEN)
 
 user_id = twitch.get_users(logins=[USERNAME])["data"][0]["id"]
 
@@ -161,7 +218,7 @@ pubsub.start()
 # you can either start listening before or after you started pubsub.
 uuid = pubsub.listen_whispers(user_id, callback)
 # uuid = pubsub.listen_channel_points(user_id, callback)
-input("Now listening... Press ENTER at any time to stop.\n")
+input("Now listening for events.\nPress ENTER at any time to stop.\n")
 # you do not need to unlisten to topics before stopping but you can listen and unlisten at any moment you want
 pubsub.unlisten(uuid)
 

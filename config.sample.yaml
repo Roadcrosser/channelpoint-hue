@@ -29,3 +29,5 @@ MAXIMUM_BRIGHTNESS: 100
 
 # Debug mode. Set to true for testing purposes.
 DEBUG: false
+# Whisper test mode. Set to true to test for whispers instead.
+WHISPER_MODE: false
