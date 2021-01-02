@@ -48,11 +48,12 @@ twitch.session = None
 def callback(uuid: UUID, data: dict) -> None:
     if DEBUG:
         print(data)
+
     if data["type"] != "whisper_received":
         return
 
     resp_data = data["data"]
-    resp_data = json.loads(resp_data) # Comment this if it breaks somehow
+    resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
 
     original_color = resp_data["body"]
 
@@ -64,7 +65,7 @@ def callback(uuid: UUID, data: dict) -> None:
 
     # if resp_data["reward"]["title"] != REWARD_NAME:
     #     return
-    
+
     # original_color = resp_data["user_input"]
 
     original_color = re.sub(r"\s", "", str(original_color).strip())
@@ -75,70 +76,71 @@ def callback(uuid: UUID, data: dict) -> None:
     sat = 0
     bri = 0
 
-    initiating_user = resp_data['user']['login']
+    initiating_user = resp_data["user"]["login"]
 
     try:
         color = COLOR_LOOKUP.get(color, color)
         color = re.sub(r"[^0-9a-f]", "0", "{:0>6}".format(color)[:6])
-        hue, sat, bri = colorsys.rgb_to_hsv(int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16))
+        hue, sat, bri = colorsys.rgb_to_hsv(
+            int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+        )
 
         # Hue: [0, 1) to [0, 360)
         hue = int(hue * 360)
         # Sat: [0, 1] to [0, 255]
         sat = int(sat * 255)
         # Bri: [0, 255] to [0, 255] (We're also ensuring this value stays within its bound
-        min_bri = MINIMUM_BRIGHTNESS/100 * 255
-        max_bri = MAXIMUM_BRIGHTNESS/100 * 255
+        min_bri = MINIMUM_BRIGHTNESS / 100 * 255
+        max_bri = MAXIMUM_BRIGHTNESS / 100 * 255
         bri = min(max(bri, min_bri), max_bri)
 
     except:
         print(f"{initiating_user}: Failed to parse color {original_color}")
         return
 
-    payload = {
-            "hue": hue,
-            "sat": sat,
-            "bri": bri
-        }
-    
+    payload = {"hue": hue, "sat": sat, "bri": bri}
+
     if FORCE_ON:
         payload["on"] = True
 
     hue_id = HUE_ID
 
-    asyncio.get_event_loop().create_task(callback_task(initiating_user, hue_id, payload))
+    asyncio.get_event_loop().create_task(
+        callback_task(initiating_user, hue_id, payload)
+    )
+
 
 async def callback_task(initiating_user, bulb_id, payload):
 
     if not twitch.session:
         twitch.session = aiohttp.ClientSession()
-    
+
     await twitch.session.put(
         f"{HUE_URL}/api/{HUE_KEY}/lights/{bulb_id}/state",
         headers=headers,
-        data=json.dumps(payload)
-        )
+        data=json.dumps(payload),
+    )
 
     print(f"{initiating_user}: Changed bulb {bulb_id} color to #{color}")
 
 
 while not HUE_KEY:
     # Press button
-    input('Press the link button on the bridge and then press ENTER...\n')
+    input("Press the link button on the bridge and then press ENTER...\n")
     r = requests.post(
         f"{HUE_URL}/api",
         headers=headers,
-        data=json.dumps({
-            "devicetype": "light-changing#thingy-idk"
-        })
-        )
+        data=json.dumps({"devicetype": "light-changing#thingy-idk"}),
+    )
     resp = r.json()[0]
     if "error" in resp:
         print(f"An error has occured: \"{resp['error']['description']}\"\nRetrying...")
     else:
         HUE_KEY = resp["success"]["username"]
 
-print(f"Your key is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to skip this step in the future.")
+print(
+    f"Your key is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to skip this step in the future."
+)
 
 # setting up Authentication and getting your user id
 twitch.authenticate_app([])
@@ -151,7 +153,7 @@ auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 token, refresh_token = auth.authenticate()
 twitch.set_user_authentication(token, target_scope, refresh_token)
 
-user_id = twitch.get_users(logins=[USERNAME])['data'][0]['id']
+user_id = twitch.get_users(logins=[USERNAME])["data"][0]["id"]
 
 # starting up PubSub
 pubsub = PubSub(twitch)
