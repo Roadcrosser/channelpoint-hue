@@ -66,7 +66,7 @@ def callback(uuid: UUID, data: dict) -> None:
     
     # original_color = resp_data["user_input"]
 
-    original_color = re.sub(r"\s", "", str().strip())
+    original_color = re.sub(r"\s", "", str(original_color).strip())
 
     color = original_color.lower().strip("#")
 
