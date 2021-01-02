@@ -44,28 +44,34 @@ twitch.session = None
 
 
 def callback(uuid: UUID, data: dict) -> None:
-    asyncio.get_event_loop().create_task(callback_task(data))
-
-async def callback_task(data):
-    if data["type"] != "reward-redeemed":
+    if data["type"] != "whisper_received":
         return
 
-    resp_data = data["data"]["redemption"]
+    resp_data = data["data"]["message"]
     resp_data = json.loads(resp_data) # Comment this if it breaks somehow
 
-    if resp_data["reward"]["title"] != REWARD_NAME:
-        return
+    original_color = resp_data["body"]
 
-    if not twitch.session:
-        twitch.session = aiohttp.ClientSession()
+    # if data["type"] != "reward-redeemed":
+    #     return
+
+    # resp_data = data["data"]["redemption"]
+    # resp_data = json.loads(resp_data) # Comment this if it breaks somehow
+
+    # if resp_data["reward"]["title"] != REWARD_NAME:
+    #     return
     
-    original_color = re.sub(r"\s", "", str(resp_data["user_input"]).strip())
+    # original_color = resp_data["user_input"]
+
+    original_color = re.sub(r"\s", "", str().strip())
 
     color = original_color.lower().strip("#")
 
     hue = 0
     sat = 0
     bri = 0
+
+    initiating_user = resp_data['user']['login']
 
     try:
         color = COLOR_LOOKUP.get(color, color)
@@ -82,7 +88,7 @@ async def callback_task(data):
         bri = min(max(bri, min_bri), max_bri)
 
     except:
-        print(f"{resp_data['user']['login']}: Failed to parse color {original_color}")
+        print(f"{initiating_user}: Failed to parse color {original_color}")
         return
 
     payload = {
@@ -94,13 +100,22 @@ async def callback_task(data):
     if FORCE_ON:
         payload["on"] = True
 
+    hue_id = HUE_ID
+
+    asyncio.get_event_loop().create_task(callback_task(initiating_user, hue_id, payload))
+
+async def callback_task(initiating_user, bulb_id, payload):
+
+    if not twitch.session:
+        twitch.session = aiohttp.ClientSession()
+    
     await twitch.session.put(
-        f"{HUE_URL}/api/{HUE_KEY}/lights/{HUE_ID}/state",
+        f"{HUE_URL}/api/{HUE_KEY}/lights/{bulb_id}/state",
         headers=headers,
         data=json.dumps(payload)
         )
 
-    print(f"{resp_data['user']['login']}: Changed color to #{color}")
+    print(f"{initiating_user}: Changed bulb {bulb_id} color to #{color}")
 
 
 while not HUE_KEY:
@@ -124,7 +139,8 @@ print(f"Your key is: {HUE_KEY}\nEdit the script and add this key to `HUE_KEY` to
 # setting up Authentication and getting your user id
 twitch.authenticate_app([])
 
-target_scope = [AuthScope.CHANNEL_READ_REDEMPTIONS]
+# target_scope = [AuthScope.CHANNEL_READ_REDEMPTIONS]
+target_scope = [AuthScope.WHISPERS_READ]
 auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 
 # this will open your default browser and prompt you with the twitch verification website
