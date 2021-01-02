@@ -15,7 +15,9 @@
 4. Fill in `config.yaml` with the required details (You can probably use notepad for this, but the text won't be colored)
 5. Run `run_a.bat` and follow the prompts. (If there's a weird message about Microsoft Store, run `run_b.bat` instead)
 
-**Important note**: This will only work *while* the script is running. You will have to leave it turned on (and remember to turn it on each time) for it to work.
+## Important Notes
+ - This will only work *while* the script is running. You will have to leave it turned on (and remember to turn it on each time) for it to work.
+ - Currently, you can only change just one Hue light. The Bridge doesn't let you change all your lights at the same time, so if I ever add this feature, they may not all update at once.
 
 ## Troubleshooting
 
