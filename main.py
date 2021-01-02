@@ -174,7 +174,6 @@ async def callback_task(initiating_user, bulb_id, payload, color):
 
 
 while not HUE_KEY:
-
     # Press button
     input("Press the link button on the bridge and then press ENTER...\n")
     r = requests.post(
@@ -189,8 +188,7 @@ while not HUE_KEY:
         HUE_KEY = resp["success"]["username"]
         secrets["HUE_KEY"] = HUE_KEY
         update_secrets(secrets)
-
-print("Hue successfully linked.")
+        print("Hue successfully linked.")
 
 
 # setting up Authentication and getting your user id
