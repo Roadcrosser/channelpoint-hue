@@ -26,3 +26,6 @@ MINIMUM_BRIGHTNESS: 0
 
 # A value from 0 to 100. The maximum brightness value allowed for the light to be. 
 MAXIMUM_BRIGHTNESS: 100
+
+# Debug mode. Set to true for testing purposes.
+DEBUG: false

@@ -36,6 +36,8 @@ MINIMUM_BRIGHTNESS = config["MINIMUM_BRIGHTNESS"]
 
 MAXIMUM_BRIGHTNESS = config["MAXIMUM_BRIGHTNESS"]
 
+DEBUG = config["DEBUG"]
+
 
 headers = {"content-type": "application/json"}
 
@@ -44,11 +46,12 @@ twitch.session = None
 
 
 def callback(uuid: UUID, data: dict) -> None:
-    print(data)
+    if DEBUG:
+        print(data)
     if data["type"] != "whisper_received":
         return
 
-    resp_data = data["message"]
+    resp_data = data["data"]
     resp_data = json.loads(resp_data) # Comment this if it breaks somehow
 
     original_color = resp_data["body"]
@@ -56,7 +59,7 @@ def callback(uuid: UUID, data: dict) -> None:
     # if data["type"] != "reward-redeemed":
     #     return
 
-    # resp_data = data["data"]["redemption"]
+    # resp_data = data["data"]
     # resp_data = json.loads(resp_data) # Comment this if it breaks somehow
 
     # if resp_data["reward"]["title"] != REWARD_NAME:
