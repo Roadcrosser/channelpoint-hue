@@ -18,9 +18,6 @@ REWARD_NAME: Change light color
 # Set to True to force the light on (if it was otherwise turned off) when a color change request comes through. Set to False to make it not do that.
 FORCE_ON: true
 
-# If you don't have one yet, you can get one later and put it here when you do get it
-HUE_KEY: null
-
 # A value from 0 to 100. The minimum brightness value allowed for the light to be. 
 MINIMUM_BRIGHTNESS: 0
 
@@ -29,5 +26,6 @@ MAXIMUM_BRIGHTNESS: 100
 
 # Debug mode. Set to true for testing purposes.
 DEBUG: false
+
 # Whisper test mode. Set to true to test for whispers instead.
 WHISPER_MODE: false
