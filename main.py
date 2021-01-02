@@ -199,10 +199,10 @@ twitch.authenticate_app([])
 target_scope = [
     AuthScope.CHANNEL_READ_REDEMPTIONS if not WHISPER_MODE else AuthScope.WHISPERS_READ
 ]
-auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 
 if (not TOKEN) or (not REFRESH_TOKEN):
     # this will open your default browser and prompt you with the twitch verification website
+    auth = UserAuthenticator(twitch, target_scope, force_verify=False)
     TOKEN, REFRESH_TOKEN = auth.authenticate()
     secrets["TOKEN"] = TOKEN
     secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
@@ -216,8 +216,11 @@ user_id = twitch.get_users(logins=[USERNAME])["data"][0]["id"]
 pubsub = PubSub(twitch)
 pubsub.start()
 # you can either start listening before or after you started pubsub.
-uuid = pubsub.listen_whispers(user_id, callback)
-# uuid = pubsub.listen_channel_points(user_id, callback)
+if WHISPER_MODE:
+    uuid = pubsub.listen_whispers(user_id, callback)
+else:
+    uuid = pubsub.listen_channel_points(user_id, callback)
+
 input("Now listening for events.\nPress ENTER at any time to stop.\n")
 # you do not need to unlisten to topics before stopping but you can listen and unlisten at any moment you want
 pubsub.unlisten(uuid)
