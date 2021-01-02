@@ -44,6 +44,7 @@ twitch.session = None
 
 
 def callback(uuid: UUID, data: dict) -> None:
+    print(data)
     if data["type"] != "whisper_received":
         return
 
@@ -155,7 +156,7 @@ pubsub.start()
 # you can either start listening before or after you started pubsub.
 uuid = pubsub.listen_whispers(user_id, callback)
 # uuid = pubsub.listen_channel_points(user_id, callback)
-input('press ENTER to close...\n')
+input("Now listening... Press ENTER at any time to stop.\n")
 # you do not need to unlisten to topics before stopping but you can listen and unlisten at any moment you want
 pubsub.unlisten(uuid)
 
