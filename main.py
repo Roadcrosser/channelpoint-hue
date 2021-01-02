@@ -45,15 +45,16 @@ twitch.session = None
 
 def callback(uuid: UUID, data: dict) -> None:
     print(data)
-    if data["type"] != "MESSAGE":
+    if data["type"] != "whisper_received":
         return
 
     resp_data = data["data"]["message"]
     resp_data = json.loads(resp_data) # Comment this if it breaks somehow
 
-    if resp_data["type"] != "whisper_received":
-        return
     original_color = resp_data["body"]
+
+    print()
+    print(original_color)
 
     # if data["type"] != "reward-redeemed":
     #     return
