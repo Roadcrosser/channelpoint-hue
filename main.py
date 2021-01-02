@@ -55,7 +55,7 @@ def update_secrets(new_data):
 
 def load_secrets():
     with open(secrets_fn) as fl:
-        return json.loads(fl)
+        return json.loads(fl.read())
 
 
 if not secrets_fn in os.listdir():
