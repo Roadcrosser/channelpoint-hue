@@ -1,6 +1,6 @@
 # Twitch Channel Points Philips Hue integration
 
-Requirements:
+## Requirements
 
  - a Philips Hue Bridge (it's the box you press a button with to connect it with your streamdeck I think)
  - a Philips Hue
@@ -8,9 +8,16 @@ Requirements:
 
 (I don't have any of these things so I've never tested any of this)
 
+## Guide
 1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't. Ensure the "Install to PATH" setting is checked.
 2. Run `pip install -r requirements.txt` in command prompt (Admin mode) to install dependencies (you only need to do this once)
-3. Fill in `config.yaml` with the required details (You can probably use notepad for this, but the text won't be colored)
-4. Run `run.bat` and follow the prompts
+3. Copy `config.sample.yaml` and rename it `config.yaml`
+4. Fill in `config.yaml` with the required details (You can probably use notepad for this, but the text won't be colored)
+5. Run `run.bat` and follow the prompts
 
 **Important note**: This will only work *while* the script is running. You will have to leave it turned on (and remember to turn it on each time) for it to work.
+
+## Troubleshooting
+
+**It doesn't work when I run it, but it worked the last time I did!**
+Your Twitch credentials may have expired. Delete `secrets.json` and reauthenticate.
