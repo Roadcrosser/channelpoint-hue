@@ -17,6 +17,7 @@
 
 ## Important Notes
  - This will only work *while* the script is running. You will have to leave it turned on (and remember to turn it on each time) for it to work.
+ - In the same vein, any redemptions done before or after this script is run will be lost. Running it won't immediately run any that were missed.
  - Currently, you can only change just one Hue light. The Bridge doesn't let you change all your lights at the same time, so if I ever add this feature, they may not all update at once.
 
 ## Troubleshooting
