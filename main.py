@@ -173,11 +173,15 @@ async def callback_task(initiating_user, bulb_id, payload, color):
         if not twitch.session:
             twitch.session = aiohttp.ClientSession()
 
-        await twitch.session.put(
+        async with twitch.session.put(
             f"{HUE_URL}/api/{HUE_KEY}/lights/{bulb_id}/state",
             headers=headers,
             data=json.dumps(payload),
-        )
+        ) as r:
+            resp = await r.text()
+
+        if DEBUG:
+            print("Response:", resp)
 
         print(f"{initiating_user}: Changed bulb {bulb_id} color to #{color}")
 
