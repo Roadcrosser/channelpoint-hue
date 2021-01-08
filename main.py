@@ -1,6 +1,6 @@
 from twitchAPI.pubsub import PubSub
 from twitchAPI.twitch import Twitch
-from twitchAPI.types import AuthScope
+from twitchAPI.types import AuthScope, InvalidRefreshTokenException
 from twitchAPI.oauth import UserAuthenticator, refresh_access_token
 from uuid import UUID
 
@@ -256,12 +256,19 @@ target_scope = [
     AuthScope.CHANNEL_READ_REDEMPTIONS if not WHISPER_MODE else AuthScope.WHISPERS_READ
 ]
 
+auth = UserAuthenticator(twitch, target_scope, force_verify=False)
+
 if (not TOKEN) or (not REFRESH_TOKEN):
     # this will open your default browser and prompt you with the twitch verification website
-    auth = UserAuthenticator(twitch, target_scope, force_verify=False)
     TOKEN, REFRESH_TOKEN = auth.authenticate()
 else:
-    TOKEN, REFRESH_TOKEN = refresh_access_token(REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET)
+    try:
+        TOKEN, REFRESH_TOKEN = refresh_access_token(
+            REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET
+        )
+    except InvalidRefreshTokenException:
+        TOKEN, REFRESH_TOKEN = auth.authenticate()
+
 
 twitch_secrets["TOKEN"] = TOKEN
 twitch_secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
