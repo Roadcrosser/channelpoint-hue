@@ -1,7 +1,7 @@
 from twitchAPI.pubsub import PubSub
 from twitchAPI.twitch import Twitch
 from twitchAPI.types import AuthScope
-from twitchAPI.oauth import UserAuthenticator
+from twitchAPI.oauth import UserAuthenticator, refresh_access_token
 from uuid import UUID
 
 import asyncio
@@ -243,9 +243,10 @@ if "error" in resp:
     print(f"An error has occured: \"{resp['error']['description']}\"\nAborting.")
     exit()
 else:
-    print("Hue successfully connected. Data:")
-    pp = pprint.PrettyPrinter(indent=4)
-    pp.pprint(resp)
+    print("Hue successfully connected.")
+    if DEBUG:
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(resp)
 
 
 # setting up Authentication and getting your user id
@@ -259,9 +260,12 @@ if (not TOKEN) or (not REFRESH_TOKEN):
     # this will open your default browser and prompt you with the twitch verification website
     auth = UserAuthenticator(twitch, target_scope, force_verify=False)
     TOKEN, REFRESH_TOKEN = auth.authenticate()
-    twitch_secrets["TOKEN"] = TOKEN
-    twitch_secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
-    update_twitch_secrets(twitch_secrets)
+else:
+    TOKEN, REFRESH_TOKEN = refresh_access_token(REFRESH_TOKEN, CLIENT_ID, CLIENT_SECRET)
+
+twitch_secrets["TOKEN"] = TOKEN
+twitch_secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
+update_twitch_secrets(twitch_secrets)
 
 twitch.set_user_authentication(TOKEN, target_scope, REFRESH_TOKEN)
 

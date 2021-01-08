@@ -9,7 +9,7 @@ Watch it in action [here](https://clips.twitch.tv/SpikyLovelySwallowFailFish)!
  - at least affiliate on Twitch for access to channel points
 
 ## Guide
-1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't. Ensure the "Add to PATH" setting is checked. See [here](https://datatofish.com/add-python-to-windows-path/) for how to add Python to PATH if it was already installed without that setting checked.
+1. Install [Python3.7.x](https://www.python.org/downloads/) if you haven't (Doesn't work on 3.9, unsure about 3.8). Ensure the "Add to PATH" setting is checked. See [here](https://datatofish.com/add-python-to-windows-path/) for how to add Python to PATH if it was already installed without that setting checked.
 2. Run `pip install -r requirements.txt` in command prompt (Admin mode) to install dependencies (you only need to do this once)
 3. Copy `config.sample.yaml` and rename it `config.yaml`
 4. Fill in `config.yaml` with the required details (You can probably use notepad for this, but the text won't be colored)
@@ -25,7 +25,3 @@ Watch it in action [here](https://clips.twitch.tv/SpikyLovelySwallowFailFish)!
 **It breaks on Step 2!**
 
 Ensure you're on Admin Mode. Some systems may also require you to use `pip3` instead of `pip`
-
-**It doesn't work when I run it, but it worked the last time I did!**
-
-Your Twitch credentials may have expired. Delete `secrets.json` and reauthenticate.
