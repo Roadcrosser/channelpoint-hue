@@ -1,5 +1,6 @@
 config.yaml
-secrets.json
+hue_data.json
+twitch_secrets.json
 
 .vscode/
 
