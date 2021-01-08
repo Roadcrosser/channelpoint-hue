@@ -196,7 +196,7 @@ async def callback_task(initiating_user, group_id, payload, color):
             twitch.session = aiohttp.ClientSession()
 
         async with twitch.session.put(
-            f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/state",
+            f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/action",
             headers=headers,
             data=json.dumps(payload),
         ) as r:
@@ -233,7 +233,7 @@ while not HUE_KEY:
         print("Hue successfully linked.")
 
 print("Querying hue...")
-r = requests.post(
+r = requests.get(
     f"{HUE_URL}/api/{HUE_KEY}/groups",
     headers=headers,
     data=json.dumps({"devicetype": "light-changing#thingy-idk"}),
