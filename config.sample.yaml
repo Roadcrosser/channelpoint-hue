@@ -1,4 +1,5 @@
-# You can apparently get this from discovery.meethue.com (apparently your bridge may need to be "discoverable"?)
+# You can apparently get this from https://discovery.meethue.com (apparently your bridge may need to be "discoverable"?)
+# If your internet dies this may change so you will have to redo this step.
 HUE_URL: http://192.168.86.34
 
 # Your light group number, 0 means all of them.
