@@ -1,8 +1,8 @@
 # You can apparently get this from discovery.meethue.com (apparently your bridge may need to be "discoverable"?)
 HUE_URL: http://192.168.86.34
 
-# Your light number, it's probably 1
-HUE_ID: 1
+# Your light group number, 0 means all of them.
+HUE_ID: 0
 
 # Create a Twitch application here: https://dev.twitch.tv/console/apps/create
 # (Twitch will complain if you don't have 2-Factor Authentication enabled though)
@@ -28,5 +28,5 @@ MAXIMUM_BRIGHTNESS: 100
 DEBUG: false
 
 # Whisper test mode. Set to true to test for whispers instead.
-# IMPORTANT: Delete secrets.json whenever this is changed.
+# IMPORTANT: Delete twitch_secrets.json whenever this is changed.
 WHISPER_MODE: false

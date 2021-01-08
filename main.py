@@ -7,6 +7,7 @@ from uuid import UUID
 import asyncio
 import traceback
 import colorsys
+import pprint
 import json
 import sys
 import re
@@ -40,34 +41,55 @@ MAXIMUM_BRIGHTNESS = config["MAXIMUM_BRIGHTNESS"]
 DEBUG = config["DEBUG"]
 WHISPER_MODE = config["WHISPER_MODE"]
 
-secrets = {
-    "HUE_KEY": None,
+hue_data = {"HUE_KEY": None}
+
+twitch_secrets = {
     "TOKEN": None,
     "REFRESH_TOKEN": None,
 }
 
 
-secrets_fn = "secrets.json"
+hue_data_fn = "hue_data.json"
+secrets_fn = "twitch_secrets.json"
 
 
-def update_secrets(new_data):
+def update_twitch_secrets(new_data):
     with open(secrets_fn, "w+") as fl:
         fl.write(json.dumps(new_data))
 
 
-def load_secrets():
+def load_twitch_secrets():
     with open(secrets_fn) as fl:
         return json.loads(fl.read())
 
 
-if not secrets_fn in os.listdir():
-    update_secrets(secrets)
-else:
-    secrets = load_secrets()
+def update_hue_data(new_data):
+    with open(hue_data_fn, "w+") as fl:
+        fl.write(json.dumps(new_data))
 
-HUE_KEY = secrets["HUE_KEY"]
-TOKEN = secrets["TOKEN"]
-REFRESH_TOKEN = secrets["REFRESH_TOKEN"]
+
+def load_hue_data():
+    with open(hue_data_fn) as fl:
+        return json.loads(fl.read())
+
+
+file_list = os.listdir()
+
+if not secrets_fn in file_list:
+    update_twitch_secrets(twitch_secrets)
+else:
+    twitch_secrets = load_twitch_secrets()
+
+if not hue_data_fn in file_list:
+    update_hue_data(hue_data)
+else:
+    hue_data = load_hue_data()
+
+
+HUE_KEY = hue_data["HUE_KEY"]
+
+TOKEN = twitch_secrets["TOKEN"]
+REFRESH_TOKEN = twitch_secrets["REFRESH_TOKEN"]
 
 
 headers = {"content-type": "application/json"}
@@ -100,7 +122,7 @@ def callback(uuid: UUID, data: dict) -> None:
                 return
 
             resp_data = data["data"]["redemption"]
-            # resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
+            # resp_data = json.loads(resp_data)  # Uncomment this if it breaks somehow
 
             if resp_data["reward"]["title"] != REWARD_NAME:
                 return
@@ -165,7 +187,7 @@ def callback(uuid: UUID, data: dict) -> None:
         pass
 
 
-async def callback_task(initiating_user, bulb_id, payload, color):
+async def callback_task(initiating_user, group_id, payload, color):
     try:
         if DEBUG:
             print("Running callback task...")
@@ -174,7 +196,7 @@ async def callback_task(initiating_user, bulb_id, payload, color):
             twitch.session = aiohttp.ClientSession()
 
         async with twitch.session.put(
-            f"{HUE_URL}/api/{HUE_KEY}/lights/{bulb_id}/state",
+            f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/state",
             headers=headers,
             data=json.dumps(payload),
         ) as r:
@@ -183,7 +205,7 @@ async def callback_task(initiating_user, bulb_id, payload, color):
         if DEBUG:
             print("Response:", resp)
 
-        print(f"{initiating_user}: Changed bulb {bulb_id} color to #{color}")
+        print(f"{initiating_user}: Changed bulb {group_id} color to #{color}")
 
     except Exception as e:
         print(
@@ -206,9 +228,24 @@ while not HUE_KEY:
         print(f"An error has occured: \"{resp['error']['description']}\"\nRetrying...")
     else:
         HUE_KEY = resp["success"]["username"]
-        secrets["HUE_KEY"] = HUE_KEY
-        update_secrets(secrets)
+        hue_data["HUE_KEY"] = HUE_KEY
+        update_hue_data(hue_data)
         print("Hue successfully linked.")
+
+print("Querying hue...")
+r = requests.post(
+    f"{HUE_URL}/api/{HUE_KEY}/groups",
+    headers=headers,
+    data=json.dumps({"devicetype": "light-changing#thingy-idk"}),
+)
+resp = r.json()
+if "error" in resp:
+    print(f"An error has occured: \"{resp['error']['description']}\"\nAborting.")
+    exit()
+else:
+    print("Hue successfully connected. Data:")
+    pp = pprint.PrettyPrinter(indent=4)
+    pp.pprint(resp)
 
 
 # setting up Authentication and getting your user id
@@ -222,9 +259,9 @@ if (not TOKEN) or (not REFRESH_TOKEN):
     # this will open your default browser and prompt you with the twitch verification website
     auth = UserAuthenticator(twitch, target_scope, force_verify=False)
     TOKEN, REFRESH_TOKEN = auth.authenticate()
-    secrets["TOKEN"] = TOKEN
-    secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
-    update_secrets(secrets)
+    twitch_secrets["TOKEN"] = TOKEN
+    twitch_secrets["REFRESH_TOKEN"] = REFRESH_TOKEN
+    update_twitch_secrets(twitch_secrets)
 
 twitch.set_user_authentication(TOKEN, target_scope, REFRESH_TOKEN)
 
