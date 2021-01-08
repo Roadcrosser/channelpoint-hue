@@ -99,14 +99,14 @@ def callback(uuid: UUID, data: dict) -> None:
             if data["type"] != "reward-redeemed":
                 return
 
-            resp_data = data["data"]
-            resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
+            resp_data = data["data"]["redemption"]
+            # resp_data = json.loads(resp_data)  # Comment this if it breaks somehow
 
             if resp_data["reward"]["title"] != REWARD_NAME:
                 return
 
             initiating_user = resp_data["user"]["login"]
-            original_color = resp_data["user_input"]
+            original_color = resp_data.get("user_input", "ffffff")
 
         ### End Block ###
 
@@ -128,8 +128,8 @@ def callback(uuid: UUID, data: dict) -> None:
                 int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
             )
 
-            # Hue: [0, 1) to [0, 360)
-            hue = int(hue * 360)
+            # Hue: [0, 1) to [0, 65535)
+            hue = int(hue * 65535)
             # Sat: [0, 1] to [0, 255]
             sat = int(sat * 255)
             # Bri: [0, 255] to [0, 255] (We're also ensuring this value stays within its bound

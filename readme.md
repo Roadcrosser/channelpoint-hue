@@ -2,11 +2,9 @@
 
 ## Requirements
 
- - a Philips Hue Bridge (it's the box you press a button with to connect it with your streamdeck I think)
+ - a Philips Hue Bridge
  - a Philips Hue
  - at least affiliate on Twitch for access to channel points
-
-(I don't have any of these things so I've never tested any of this)
 
 ## Guide
 1. Install [Python3.7+](https://www.python.org/downloads/) if you haven't. Ensure the "Add to PATH" setting is checked. See [here](https://datatofish.com/add-python-to-windows-path/) for how to add Python to PATH if it was already installed without that setting checked.
