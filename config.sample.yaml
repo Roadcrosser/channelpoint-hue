@@ -2,7 +2,7 @@
 # If your internet dies this may change so you will have to redo this step.
 HUE_URL: http://192.168.86.34
 
-# Your light group number, 0 means all of them.
+# Your light group number, 0 means all of them. Run Debug mode to list all your light groups.
 HUE_ID: 0
 
 # Create a Twitch application here: https://dev.twitch.tv/console/apps/create
