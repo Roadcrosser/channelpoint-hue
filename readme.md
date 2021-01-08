@@ -1,5 +1,7 @@
 # Twitch Channel Points Philips Hue integration
 
+Watch it in action [here](https://clips.twitch.tv/SpikyLovelySwallowFailFish)!
+
 ## Requirements
 
  - a Philips Hue Bridge
