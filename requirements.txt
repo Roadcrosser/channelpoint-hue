@@ -1,4 +1,4 @@
 twitchAPI
 requests
 aiohttp
-pyaml
+PyYAML
