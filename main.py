@@ -97,12 +97,6 @@ headers = {"content-type": "application/json"}
 twitch = Twitch(CLIENT_ID, CLIENT_SECRET)
 twitch.session = None
 
-special_effects = {
-    "blink": blink_effect,
-    "rainbow": rainbow_effect,
-    "police": police_effect,
-}
-
 
 def format_payload(payload):
     if FORCE_ON:
@@ -134,6 +128,13 @@ async def police_effect():
     await send_request(HUE_ID, red)
     await asyncio.sleep(0.5)
     await send_request(HUE_ID, blue)
+
+
+special_effects = {
+    "blink": blink_effect,
+    "rainbow": rainbow_effect,
+    "police": police_effect,
+}
 
 
 def callback(uuid: UUID, data: dict) -> None:
