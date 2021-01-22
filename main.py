@@ -99,8 +99,8 @@ twitch.session = None
 
 
 def format_payload(payload):
-    if FORCE_ON:
-        payload["on"] = True
+    # if FORCE_ON:
+    #     payload["on"] = True
 
     return payload
 
