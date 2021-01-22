@@ -97,6 +97,44 @@ headers = {"content-type": "application/json"}
 twitch = Twitch(CLIENT_ID, CLIENT_SECRET)
 twitch.session = None
 
+special_effects = {
+    "blink": blink_effect,
+    "rainbow": rainbow_effect,
+    "police": police_effect,
+}
+
+
+def format_payload(payload):
+    if FORCE_ON:
+        payload["on"] = True
+
+    return payload
+
+
+async def blink_effect():
+    payload = format_payload({"alert": "select"})
+    await send_request(HUE_ID, payload)
+
+
+async def rainbow_effect():
+    payload1 = format_payload({"hue": 0, "sat": 254, "bri": 254})
+    payload2 = format_payload({"hue": 65535, "transitiontime": 300})
+    await send_request(HUE_ID, payload1)
+    await send_request(HUE_ID, payload2)
+
+
+async def police_effect():
+    red = format_payload({"hue": 0, "sat": 254, "bri": 254})
+    blue = format_payload({"hue": 43690, "sat": 254, "bri": 254})
+
+    await send_request(HUE_ID, red)
+    await asyncio.sleep(0.5)
+    await send_request(HUE_ID, blue)
+    await asyncio.sleep(0.5)
+    await send_request(HUE_ID, red)
+    await asyncio.sleep(0.5)
+    await send_request(HUE_ID, blue)
+
 
 def callback(uuid: UUID, data: dict) -> None:
     try:
@@ -138,46 +176,52 @@ def callback(uuid: UUID, data: dict) -> None:
         original_color = re.sub(r"\s", "", str(original_color).strip())
 
         color = original_color.lower().strip("#")
+        effect = False
+        payload = None
 
-        hue = 0
-        sat = 0
-        bri = 0
+        if color in special_effects:
+            effect = special_effects.get(color)
+            if DEBUG:
+                print("Effect:", effect)
+        else:
 
-        try:
-            color = COLOR_LOOKUP.get(color, color)
-            color = re.sub(r"[^0-9a-f]", "0", "{:0>6}".format(color)[:6])
-            hue, sat, bri = colorsys.rgb_to_hsv(
-                int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
-            )
+            hue = 0
+            sat = 0
+            bri = 0
 
-            # Hue: [0, 1) to [0, 65535)
-            hue = int(hue * 65535)
-            # Sat: [0, 1] to [0, 254]
-            sat = int(sat * 254)
-            # Bri: [0, 255] to [0, 254] (We're also ensuring this value stays within its bound
-            min_bri = MINIMUM_BRIGHTNESS / 100 * 254
-            max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
-            bri = min(max(bri, min_bri), max_bri)
+            try:
+                color = COLOR_LOOKUP.get(color, color)
+                color = re.sub(r"[^0-9a-f]", "0", "{:0>6}".format(color)[:6])
+                hue, sat, bri = colorsys.rgb_to_hsv(
+                    int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+                )
 
-        except:
-            print(f"{initiating_user}: Failed to parse color {original_color}")
-            return
+                # Hue: [0, 1) to [0, 65535)
+                hue = int(hue * 65535)
+                # Sat: [0, 1] to [0, 254]
+                sat = int(sat * 254)
+                # Bri: [0, 255] to [0, 254] (We're also ensuring this value stays within its bound
+                min_bri = MINIMUM_BRIGHTNESS / 100 * 254
+                max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
+                bri = min(max(bri, min_bri), max_bri)
 
-        if DEBUG:
-            print("Final color:", color)
+            except:
+                print(f"{initiating_user}: Failed to parse color {original_color}")
+                return
 
-        payload = {"hue": hue, "sat": sat, "bri": bri}
+            if DEBUG:
+                print("Final color:", color)
 
-        if FORCE_ON:
-            payload["on"] = True
+            payload = {"hue": hue, "sat": sat, "bri": bri}
+
+            payload = format_payload(payload)
+
+            if DEBUG:
+                print("Sending to hue:", payload)
 
         hue_id = HUE_ID
-
-        if DEBUG:
-            print("Sending to hue:", payload)
-
         asyncio.get_event_loop().create_task(
-            callback_task(initiating_user, hue_id, payload, color)
+            callback_task(initiating_user, hue_id, payload, color, effect)
         )
     except Exception as e:
         print(
@@ -187,25 +231,17 @@ def callback(uuid: UUID, data: dict) -> None:
         pass
 
 
-async def callback_task(initiating_user, group_id, payload, color):
+async def callback_task(initiating_user, group_id, payload, color, effect):
     try:
         if DEBUG:
             print("Running callback task...")
 
-        if not twitch.session:
-            twitch.session = aiohttp.ClientSession()
-
-        async with twitch.session.put(
-            f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/action",
-            headers=headers,
-            data=json.dumps(payload),
-        ) as r:
-            resp = await r.text()
-
-        if DEBUG:
-            print("Response:", resp)
-
-        print(f"{initiating_user}: Changed bulb {group_id} color to #{color}")
+        if effect:
+            print(f"{initiating_user}: Running {color} effect on group {group_id}")
+            await effect(group_id)
+        else:
+            send_request(group_id, payload)
+            print(f"{initiating_user}: Changed group {group_id} color to #{color}")
 
     except Exception as e:
         print(
@@ -213,6 +249,25 @@ async def callback_task(initiating_user, group_id, payload, color):
             file=sys.stderr,
         )
         pass
+
+
+async def send_request(group_id, payload):
+
+    if DEBUG:
+        print("Sending request...")
+
+    if not twitch.session:
+        twitch.session = aiohttp.ClientSession()
+
+    async with twitch.session.put(
+        f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/action",
+        headers=headers,
+        data=json.dumps(payload),
+    ) as r:
+        resp = await r.text()
+
+    if DEBUG:
+        print("Response:", resp)
 
 
 while not HUE_KEY:
