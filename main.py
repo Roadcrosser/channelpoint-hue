@@ -99,8 +99,8 @@ twitch.session = None
 
 
 def format_payload(payload):
-    # if FORCE_ON:
-    #     payload["on"] = True
+    if FORCE_ON:
+        payload["on"] = True
 
     return payload
 
@@ -254,8 +254,10 @@ async def callback_task(initiating_user, group_id, payload, color, effect):
 
 async def send_request(group_id, payload):
 
+    payload = json.dumps(payload)
+
     if DEBUG:
-        print("Sending request...")
+        print("Sending request:", payload)
 
     if not twitch.session:
         twitch.session = aiohttp.ClientSession()
@@ -263,7 +265,7 @@ async def send_request(group_id, payload):
     async with twitch.session.put(
         f"{HUE_URL}/api/{HUE_KEY}/groups/{group_id}/action",
         headers=headers,
-        data=json.dumps(payload),
+        data=payload,
     ) as r:
         resp = await r.text()
 
