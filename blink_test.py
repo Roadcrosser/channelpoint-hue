@@ -1,6 +1,7 @@
 import json
 import yaml
 import requests
+import time
 
 headers = {"content-type": "application/json"}
 
@@ -21,6 +22,10 @@ payload2 = {"on": True, "alert": "lselect"}
 payload3 = {"on": True, "hue": 0, "sat": 254, "bri": 254}
 payload4 = {"on": True, "hue": 65535, "transitiontime": 300}
 payload5 = {"on": True, "hue": 32767, "transitiontime": 300}
+
+payload_police1 = {"on": True, "hue": 0, "sat": 254, "bri": 254}
+payload_police2 = {"on": True, "hue": 43690, "sat": 254, "bri": 254}
+
 
 input("Press ENTER to try blink 1:")
 r = requests.put(
@@ -49,4 +54,21 @@ r = requests.put(
 )
 r = requests.put(
     f"{HUE_URL}/api/{HUE_KEY}/groups/1/action", headers=headers, json=payload4,
+)
+
+input("Press ENTER to try police:")
+r = requests.put(
+    f"{HUE_URL}/api/{HUE_KEY}/groups/1/action", headers=headers, json=payload_police1,
+)
+time.sleep(0.5)
+r = requests.put(
+    f"{HUE_URL}/api/{HUE_KEY}/groups/1/action", headers=headers, json=payload_police2,
+)
+time.sleep(0.5)
+r = requests.put(
+    f"{HUE_URL}/api/{HUE_KEY}/groups/1/action", headers=headers, json=payload_police1,
+)
+time.sleep(0.5)
+r = requests.put(
+    f"{HUE_URL}/api/{HUE_KEY}/groups/1/action", headers=headers, json=payload_police2,
 )
