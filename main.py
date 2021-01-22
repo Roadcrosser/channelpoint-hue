@@ -241,7 +241,7 @@ async def callback_task(initiating_user, group_id, payload, color, effect):
             print(f"{initiating_user}: Running {color} effect on group {group_id}")
             await effect(group_id)
         else:
-            send_request(group_id, payload)
+            await send_request(group_id, payload)
             print(f"{initiating_user}: Changed group {group_id} color to #{color}")
 
     except Exception as e:
