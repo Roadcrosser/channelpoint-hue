@@ -120,6 +120,7 @@ async def rainbow_effect():
 async def police_effect():
     red = format_payload({"hue": 0, "sat": 254, "bri": 254})
     blue = format_payload({"hue": 43690, "sat": 254, "bri": 254})
+    white = format_payload({"hue": 0, "sat": 0, "bri": 254})
 
     await send_request(HUE_ID, red)
     await asyncio.sleep(0.5)
@@ -127,11 +128,13 @@ async def police_effect():
     await asyncio.sleep(0.5)
     await send_request(HUE_ID, red)
     await asyncio.sleep(0.5)
-    await send_request(HUE_ID, blue)
+    await send_request(HUE_ID, white)
 
 
 special_effects = {
     "blink": blink_effect,
+    "alert": blink_effect,
+    "strobe": blink_effect,
     "rainbow": rainbow_effect,
     "police": police_effect,
 }
@@ -199,11 +202,11 @@ def callback(uuid: UUID, data: dict) -> None:
 
                 # Hue: [0, 1) to [0, 65535)
                 hue = int(hue * 65535)
-                # Sat: [0, 1] to [0, 254]
-                sat = int(sat * 254)
-                # Bri: [0, 255] to [0, 254] (We're also ensuring this value stays within its bound
-                min_bri = MINIMUM_BRIGHTNESS / 100 * 254
-                max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
+                # Sat: [0, 1] to [0, 255]
+                sat = int(sat * 255)
+                # Bri: [0, 255] to [0, 255] (We're also ensuring this value stays within its bound
+                min_bri = MINIMUM_BRIGHTNESS / 100 * 255
+                max_bri = MAXIMUM_BRIGHTNESS / 100 * 255
                 bri = min(max(bri, min_bri), max_bri)
 
             except:
