@@ -219,7 +219,7 @@ def callback(uuid: UUID, data: dict) -> None:
                 # Bri: [0, 255] to [0, 255] (We're also ensuring this value stays within its bound
                 min_bri = MINIMUM_BRIGHTNESS / 100 * 255
                 max_bri = MAXIMUM_BRIGHTNESS / 100 * 255
-                bri = min(max(bri, min_bri), max_bri)
+                bri = int(min(max(bri, min_bri), max_bri))
 
             except:
                 print(f"{initiating_user}: Failed to parse color {original_color}")
