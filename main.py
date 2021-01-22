@@ -215,7 +215,7 @@ def callback(uuid: UUID, data: dict) -> None:
                 # Hue: [0, 1) to [0, 65535)
                 hue = int(hue * 65535)
                 # Sat: [0, 1] to [0, 254]
-                sat = int(sat * 255)
+                sat = int(sat * 254)
                 # Bri: [0, 255] to [0, 254] (We're also ensuring this value stays within its bound
                 min_bri = MINIMUM_BRIGHTNESS / 100 * 254
                 max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
