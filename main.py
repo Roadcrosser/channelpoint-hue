@@ -122,7 +122,7 @@ async def rainbow_effect():
 
     for i in range(rainbow_split + 1):
         pl = rainbow
-        pl["hue"] = rainbow_max / rainbow_split * i
+        pl["hue"] = int(rainbow_max / rainbow_split * i)
         await send_request(HUE_ID, pl)
 
     await asyncio.sleep(rainbow_total_time / rainbow_split)
