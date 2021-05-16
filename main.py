@@ -38,6 +38,8 @@ MINIMUM_BRIGHTNESS = config["MINIMUM_BRIGHTNESS"]
 
 MAXIMUM_BRIGHTNESS = config["MAXIMUM_BRIGHTNESS"]
 
+NEVER_CACHE_TWITCH = config["NEVER_CACHE_TWITCH"]
+
 DEBUG = config["DEBUG"]
 WHISPER_MODE = config["WHISPER_MODE"]
 
@@ -333,7 +335,7 @@ target_scope = [
 
 auth = UserAuthenticator(twitch, target_scope, force_verify=False)
 
-if (not TOKEN) or (not REFRESH_TOKEN):
+if (not TOKEN) or (not REFRESH_TOKEN) or (NEVER_CACHE_TWITCH):
     # this will open your default browser and prompt you with the twitch verification website
     TOKEN, REFRESH_TOKEN = auth.authenticate()
 else:
