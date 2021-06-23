@@ -104,6 +104,9 @@ def format_payload(payload):
     if FORCE_ON:
         payload["on"] = True
 
+    if "bri" in payload:
+        payload["bri"] = filter_brightness(payload["bri"])
+
     return payload
 
 
@@ -154,6 +157,31 @@ special_effects = {
     "rainbow": rainbow_effect,
     "police": police_effect,
 }
+
+
+def colorstring_to_hsb(color):
+    color = COLOR_LOOKUP.get(color, color)
+    color = re.sub(r"[^0-9a-f]", "0", "{:0>6}".format(color)[:6])
+    hue, sat, bri = colorsys.rgb_to_hsv(
+        int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
+    )
+    # Hue: [0, 1) to [0, 65535)
+    hue = int(hue * 65535)
+    # Sat: [0, 1] to [0, 254]
+    sat = int(sat * 254)
+    # Bri: [0, 255] to [0, 254]
+    bri = bri / 255 * 254
+
+    return hue, sat, bri
+
+
+def filter_brightness(bri):
+    # (Ensuring brightness stays in bounds)
+    min_bri = MINIMUM_BRIGHTNESS / 100 * 254
+    max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
+    bri = int(min(max(bri, min_bri), max_bri))
+
+    return bri
 
 
 def callback(uuid: UUID, data: dict) -> None:
@@ -210,20 +238,7 @@ def callback(uuid: UUID, data: dict) -> None:
             bri = 0
 
             try:
-                color = COLOR_LOOKUP.get(color, color)
-                color = re.sub(r"[^0-9a-f]", "0", "{:0>6}".format(color)[:6])
-                hue, sat, bri = colorsys.rgb_to_hsv(
-                    int(color[:2], 16), int(color[2:4], 16), int(color[4:6], 16)
-                )
-
-                # Hue: [0, 1) to [0, 65535)
-                hue = int(hue * 65535)
-                # Sat: [0, 1] to [0, 254]
-                sat = int(sat * 254)
-                # Bri: [0, 255] to [0, 254] (We're also ensuring this value stays within its bound
-                min_bri = MINIMUM_BRIGHTNESS / 100 * 254
-                max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
-                bri = int(min(max(bri, min_bri), max_bri))
+                hue, sat, bri = colorstring_to_hsb(color)
 
             except:
                 print(f"{initiating_user}: Failed to parse color {original_color}")
