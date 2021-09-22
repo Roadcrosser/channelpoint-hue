@@ -100,6 +100,15 @@ twitch = Twitch(CLIENT_ID, CLIENT_SECRET)
 twitch.session = None
 
 
+def filter_brightness(bri):
+    # (Ensuring brightness stays in bounds)
+    min_bri = MINIMUM_BRIGHTNESS / 100 * 254
+    max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
+    bri = int(min(max(bri, min_bri), max_bri))
+
+    return bri
+
+
 def format_payload(payload):
     if FORCE_ON:
         payload["on"] = True
@@ -173,15 +182,6 @@ def colorstring_to_hsb(color):
     bri = bri / 255 * 254
 
     return hue, sat, bri
-
-
-def filter_brightness(bri):
-    # (Ensuring brightness stays in bounds)
-    min_bri = MINIMUM_BRIGHTNESS / 100 * 254
-    max_bri = MAXIMUM_BRIGHTNESS / 100 * 254
-    bri = int(min(max(bri, min_bri), max_bri))
-
-    return bri
 
 
 def callback(uuid: UUID, data: dict) -> None:
