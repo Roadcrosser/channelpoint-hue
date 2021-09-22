@@ -287,7 +287,7 @@ async def callback_task(initiating_user, group_id, payload, color, effect):
 
 
 async def send_request(group_id, payload):
-    asyncio.get_event_loop.create_task(_send_request(group_id, payload))
+    asyncio.get_event_loop().create_task(_send_request(group_id, payload))
 
 
 async def _send_request(group_id, payload):
