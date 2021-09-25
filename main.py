@@ -137,7 +137,7 @@ async def rainbow_effect():
     for i in range(rainbow_split + 1):
         pl = rainbow
         pl["hue"] = int(rainbow_max / rainbow_split * i)
-        await send_request(HUE_ID, pl)
+        await _send_request(HUE_ID, pl)
 
         await asyncio.sleep(rainbow_total_time / rainbow_split)
 
@@ -149,8 +149,8 @@ async def police_effect():
     blue = format_payload({"hue": 43690, "sat": 254, "bri": 254})
 
     for payload in [red, blue, red, blue, white_payload]:
-        await send_request(HUE_ID, payload)
-        await asyncio.sleep(1)
+        await _send_request(HUE_ID, payload)
+        await asyncio.sleep(0.5)
 
 
 special_effects = {
