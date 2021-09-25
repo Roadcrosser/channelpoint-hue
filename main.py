@@ -148,15 +148,9 @@ async def police_effect():
     red = format_payload({"hue": 0, "sat": 254, "bri": 254})
     blue = format_payload({"hue": 43690, "sat": 254, "bri": 254})
 
-    await send_request(HUE_ID, red)
-    await asyncio.sleep(0.5)
-    await send_request(HUE_ID, blue)
-    await asyncio.sleep(0.5)
-    await send_request(HUE_ID, red)
-    await asyncio.sleep(0.5)
-    await send_request(HUE_ID, blue)
-    await asyncio.sleep(0.5)
-    await send_request(HUE_ID, white_payload)
+    for payload in [red, blue, red, blue, white_payload]:
+        await send_request(HUE_ID, payload)
+        await asyncio.sleep(1)
 
 
 special_effects = {
