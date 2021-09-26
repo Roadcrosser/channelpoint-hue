@@ -345,7 +345,10 @@ target_scope = [
     AuthScope.CHANNEL_READ_REDEMPTIONS if not WHISPER_MODE else AuthScope.WHISPERS_READ
 ]
 
-auth = UserAuthenticator(twitch, target_scope, force_verify=False)
+auth = UserAuthenticator(twitch, target_scope, force_verify=False,)
+
+auth.port = config.get("OAUTH_PORT", 17563)
+auth.url = f"http://localhost:{auth.port}"
 
 if (not TOKEN) or (not REFRESH_TOKEN) or (NEVER_CACHE_TWITCH):
     # this will open your default browser and prompt you with the twitch verification website
