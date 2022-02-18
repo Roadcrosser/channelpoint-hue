@@ -110,11 +110,11 @@ def filter_brightness(bri):
 
 
 def format_payload(payload):
-    if FORCE_ON:
-        payload["on"] = True
-
     if "bri" in payload:
         payload["bri"] = filter_brightness(payload["bri"])
+    
+    if FORCE_ON:
+        payload["on"] = payload["bri"] != 0
 
     return payload
 
