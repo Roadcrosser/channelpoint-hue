@@ -7,6 +7,7 @@ COLOR_LOOKUP = {
     "beige": "f5f5dc",
     "bisque": "ffe4c4",
     "black": "000000",
+    "off": "000000",
     "blanchedalmond": "ffebcd",
     "blue": "0000ff",
     "blueviolet": "8a2be2",
