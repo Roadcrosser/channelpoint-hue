@@ -1,6 +1,6 @@
 # Twitch Channel Points Philips Hue integration
 
-Watch it in action [here](https://clips.twitch.tv/SpikyLovelySwallowFailFish)!
+Watch it in action [here](https://m.twitch.tv/cdawgva/clip/SillyObeseBadgerPraiseIt-NoG6VrDXmgIgtT0M)!
 
 ## Requirements
 
